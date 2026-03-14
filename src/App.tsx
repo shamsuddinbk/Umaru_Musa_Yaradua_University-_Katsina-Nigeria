@@ -1,14 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Faculties from './components/Faculties';
 import News from './components/News';
+import ContactForm from './components/ContactForm';
 import AIAssistant from './components/AIAssistant';
 import Footer from './components/Footer';
 import { motion } from 'motion/react';
 import { Shield, BookOpen, Users, Globe } from 'lucide-react';
+import { supabaseService } from './services/supabaseService';
+import { Stat } from './types';
+import * as Icons from 'lucide-react';
 
 export default function App() {
+  const [stats, setStats] = useState<Stat[]>([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const fetchedStats = await supabaseService.getStats();
+      setStats(fetchedStats);
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="min-h-screen selection:bg-umyu-green selection:text-white">
       <Navbar />
@@ -78,27 +92,18 @@ export default function App() {
         <section className="py-24 bg-umyu-dark text-white">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid md:grid-cols-3 gap-12">
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Users className="w-8 h-8 text-umyu-gold" />
-                </div>
-                <h4 className="text-4xl font-bold mb-2">15,000+</h4>
-                <p className="text-white/60 uppercase tracking-widest text-xs font-bold">Active Students</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <BookOpen className="w-8 h-8 text-umyu-gold" />
-                </div>
-                <h4 className="text-4xl font-bold mb-2">9</h4>
-                <p className="text-white/60 uppercase tracking-widest text-xs font-bold">Faculties</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Globe className="w-8 h-8 text-umyu-gold" />
-                </div>
-                <h4 className="text-4xl font-bold mb-2">50+</h4>
-                <p className="text-white/60 uppercase tracking-widest text-xs font-bold">Programmes</p>
-              </div>
+              {stats.map((stat) => {
+                const IconComponent = (Icons as any)[stat.icon] || Icons.Activity;
+                return (
+                  <div key={stat.id} className="text-center">
+                    <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      <IconComponent className="w-8 h-8 text-umyu-gold" />
+                    </div>
+                    <h4 className="text-4xl font-bold mb-2">{stat.value}</h4>
+                    <p className="text-white/60 uppercase tracking-widest text-xs font-bold">{stat.label}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -135,6 +140,8 @@ export default function App() {
             </div>
           </div>
         </section>
+
+        <ContactForm />
       </main>
 
       <Footer />

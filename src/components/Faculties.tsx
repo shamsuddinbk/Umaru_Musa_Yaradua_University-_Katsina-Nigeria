@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { FACULTIES } from '../constants';
+import { FACULTIES as DEFAULT_FACULTIES } from '../constants';
 import * as Icons from 'lucide-react';
+import { supabaseService } from '../services/supabaseService';
+import { Faculty } from '../types';
 
 export default function Faculties() {
+  const [faculties, setFaculties] = useState<Faculty[]>(DEFAULT_FACULTIES);
+
+  useEffect(() => {
+    const fetchFaculties = async () => {
+      const fetchedFaculties = await supabaseService.getFaculties();
+      setFaculties(fetchedFaculties);
+    };
+    fetchFaculties();
+  }, []);
+
   return (
     <section id="academics" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -17,7 +29,7 @@ export default function Faculties() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {FACULTIES.map((faculty, index) => {
+          {faculties.map((faculty, index) => {
             const IconComponent = (Icons as any)[faculty.icon] || Icons.BookOpen;
             return (
               <motion.a

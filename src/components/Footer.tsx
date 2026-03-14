@@ -1,7 +1,10 @@
 import React from 'react';
-import { GraduationCap, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { GraduationCap, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Database } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Footer() {
+  const isConnected = !!supabase;
+
   return (
     <footer id="contact" className="bg-slate-900 text-white pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-6">
@@ -24,6 +27,15 @@ export default function Footer() {
                   <Icon className="w-5 h-5" />
                 </a>
               ))}
+            </div>
+            
+            {/* Connection Status */}
+            <div className="flex items-center gap-2 pt-4">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className="text-[10px] uppercase tracking-widest font-bold text-slate-500 flex items-center gap-1">
+                <Database className="w-3 h-3" />
+                Supabase {isConnected ? 'Connected' : 'Disconnected'}
+              </span>
             </div>
           </div>
 

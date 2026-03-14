@@ -25,3 +25,19 @@ export interface EventItem {
   date: string;
   location: string;
 }
+
+export interface ContactSubmission {
+  id?: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  created_at?: string;
+}
+
+export interface Stat {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+}

@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { NEWS_ITEMS, EVENTS } from '../constants';
+import { NEWS_ITEMS as DEFAULT_NEWS, EVENTS as DEFAULT_EVENTS } from '../constants';
 import { Calendar, MapPin, ArrowRight, Clock } from 'lucide-react';
+import { supabaseService } from '../services/supabaseService';
+import { NewsItem, EventItem } from '../types';
 
 export default function News() {
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(DEFAULT_NEWS);
+  const [events, setEvents] = useState<EventItem[]>(DEFAULT_EVENTS);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const [fetchedNews, fetchedEvents] = await Promise.all([
+        supabaseService.getNews(),
+        supabaseService.getEvents()
+      ]);
+      setNewsItems(fetchedNews);
+      setEvents(fetchedEvents);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <section id="news" className="py-24 bg-slate-50">
       <div className="max-w-7xl mx-auto px-6">
@@ -21,7 +42,7 @@ export default function News() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">
-              {NEWS_ITEMS.map((news, index) => (
+              {newsItems.map((news, index) => (
                 <motion.div
                   key={news.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -65,11 +86,11 @@ export default function News() {
           <div>
             <h3 className="text-2xl font-bold text-slate-900 mb-8 pb-4 border-b border-slate-200">Upcoming Events</h3>
             <div className="space-y-6">
-              {EVENTS.map((event) => (
+              {events.map((event) => (
                 <div key={event.id} className="flex gap-6 group cursor-pointer">
                   <div className="flex-shrink-0 w-16 h-16 bg-white rounded-2xl border border-slate-100 flex flex-col items-center justify-center shadow-sm group-hover:bg-umyu-green group-hover:text-white transition-all">
                     <span className="text-xs font-bold uppercase">{event.date.split(' ')[0]}</span>
-                    <span className="text-xl font-black">{event.date.split(' ')[1].replace(',', '')}</span>
+                    <span className="text-xl font-black">{event.date.split(' ')[1]?.replace(',', '') || ''}</span>
                   </div>
                   <div className="flex flex-col justify-center">
                     <h4 className="font-bold text-slate-900 group-hover:text-umyu-green transition-colors mb-1">
